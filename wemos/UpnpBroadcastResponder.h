@@ -6,9 +6,14 @@
 #include <WiFiUdp.h>
 #include "Switch.h"
 
+
+#define MAX_SWITCHES 14
+
 class UpnpBroadcastResponder {
 private:
         WiFiUDP UDP;  
+        Switch switches[MAX_SWITCHES];
+        int numOfSwitchs ;
 public:
         UpnpBroadcastResponder();
         ~UpnpBroadcastResponder();

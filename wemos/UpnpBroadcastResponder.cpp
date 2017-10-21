@@ -7,14 +7,13 @@ IPAddress ipMulti(239, 255, 255, 250);
 const unsigned int portMulti = 1900;
 char packetBuffer[512];   
 
-#define MAX_SWITCHES 14
-Switch switches[MAX_SWITCHES] = {};
-int numOfSwitchs = 0;
 
 //#define numOfSwitchs (sizeof(switches)/sizeof(Switch)) //array size  
  
 //<<constructor>>
 UpnpBroadcastResponder::UpnpBroadcastResponder(){
+
+  numOfSwitchs = 0;
     
 }
  

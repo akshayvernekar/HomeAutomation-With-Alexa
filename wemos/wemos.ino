@@ -2,45 +2,51 @@
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
 #include <functional>
-#include <DNSServer.h>
 #include "Switch.h"
 #include "UpnpBroadcastResponder.h"
 #include "CallbackFunction.h"
 #include <EEPROM.h>
 
+struct DeviceDetail
+{
+  String invocationName;
+  const int pin;
+};
+
+// #######################################################################
+
+/*add your switch details here*/
+/*Format {< invocation name >,< GPIO pin number of ESP8266 >} . Add more switches separeated by commas(',')*/
+DeviceDetail deviceArray[] = {{"room lights",D4},{"fan",14}};
+
+// #######################################################################
+
 // prototypes
 boolean connectWifi();
 
 
-
-/* Set these to your desired softAP credentials. They are not configurable at runtime */
+/* Set these to your desired config AP credentials. They are not configurable at runtime */
 const char *softAP_ssid = "ConfigAP";
 /* Soft AP network parameters */
 IPAddress apIP(192, 168, 4, 1);
 IPAddress netMsk(255, 255, 255, 0);
 
-// DNS server
-const byte DNS_PORT = 53;
-DNSServer dnsServer;
 
-// Change this before you flash
-//#######################################
+// Glocal variables
 char ssid[32] = {'\0'};
 char password[32] ={'\0'};
-// change gpio pins as you need it.
-//I am using ESP8266 EPS-12E GPIO16 and GPIO14
-const int relayPin1 = D4;
-const int relayPin2 = 14;
 
-//#######################################
 boolean wifiConnected = false;
+bool canConnect = false;
 
-   bool canConnect = false;
+const int DEVICE_PORT = 90;
+
+int numOfSwitches = 0;
 
 UpnpBroadcastResponder upnpBroadcastResponder;
 
-Switch *bedroom = NULL;
-Switch *fan = NULL;
+Switch *switches[MAX_SWITCHES];
+
 
 // Web server
 ESP8266WebServer server(80);
@@ -53,6 +59,10 @@ void setup()
 
   loadCredentials();
   canConnect = strlen(ssid) > 0; // Request WLAN connect if there is a SSID
+
+  numOfSwitches = sizeof(deviceArray)/sizeof(DeviceDetail);
+  Serial.print("numOfSwitches");
+  Serial.print(numOfSwitches);
   
   if(canConnect)
   {
@@ -63,13 +73,13 @@ void setup()
       
       // Define your switches here. Max 14
       // Format: Alexa invocation name, local port no, on callback, off callback
-      bedroom = new Switch("bedroom light", 90, relayPin1);
-      //kitchen = new Switch("kitchen lights", 81, kitchenLightsOn, kitchenLightsOff);
-      fan = new Switch("fan", 91, relayPin2);
-  
-      Serial.println("Adding switches upnp broadcast responder");
-      upnpBroadcastResponder.addDevice(*bedroom);
-      upnpBroadcastResponder.addDevice(*fan);
+      for(int i=0; i<numOfSwitches; i++)
+      {
+        Switch *deviceswitch = new Switch(deviceArray[i].invocationName, DEVICE_PORT+i, deviceArray[i].pin);
+        switches[i] = deviceswitch;
+        upnpBroadcastResponder.addDevice(*deviceswitch);
+      }
+      
       return;
     }
   }
@@ -83,7 +93,7 @@ void startSoftAP()
   WiFi.softAPConfig(apIP, apIP, netMsk);
   WiFi.softAP(softAP_ssid);
   delay(500); // Without delay I've seen the IP address blank
-Serial.print("AP IP address: ");
+  Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
   
   startConfigServer();
@@ -98,11 +108,7 @@ void stopSoftAP()
 }
 
 void startConfigServer()
-{
-    /* Setup the DNS server redirecting all the domains to the apIP */  
-//  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
-//  dnsServer.start(DNS_PORT, "*", apIP);
-  
+{  
   server.on("/", handleWifi);
   server.on("/wifi", handleWifi);
   server.on("/wifisave", handleWifiSave);
@@ -115,9 +121,11 @@ void loop()
 {
 	 if(wifiConnected){
       upnpBroadcastResponder.serverLoop();
-      
-      bedroom->serverLoop();
-      fan->serverLoop();
+
+      for(int i=0 ;i < numOfSwitches ; i++)
+      {
+        switches[i]->serverLoop();
+      }
 	 }
    server.handleClient();
 }
