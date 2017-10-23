@@ -1,6 +1,6 @@
 # HomeAutomation-With-Alexa with ESP8266
 
-This project supports emulates belkin wemo switches using 1 ESP 8266 chip. 
+This project supports emulates belkin wemo switches using ESP 8266 chip. 
 This Project is based on [arduino-esp8266-alexa-multiple-wemo-switch](https://github.com/kakopappa/arduino-esp8266-alexa-multiple-wemo-switch) by kakopappa with certain modifications like easy configuration of switches and wifi configs.
 
 ## How to use:
@@ -13,9 +13,9 @@ This Project is based on [arduino-esp8266-alexa-multiple-wemo-switch](https://gi
 ## How to define switches:
 To add a new switch to your project , populate below array with your invocation name and ESP8266's GPIO pin number
 
-          /*add your switch details here*/
-          /*Format {< invocation name >,< GPIO pin number of ESP8266 >} . Add more switches separeated by commas(',')*/
-          DeviceDetail deviceArray[] = {{"room lights",D4},{"fan",14}};
+        /*add your switch details here*/
+        /*Format {< invocation name >,< GPIO pin number of ESP8266 >} . Add more switches separeated by commas(',')*/
+        DeviceDetail deviceArray[] = {{"room lights",D4},{"fan",14}};
 
 
 ## How to configure Wifi:
