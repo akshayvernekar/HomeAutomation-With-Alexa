@@ -11,7 +11,7 @@ This Project is based on [arduino-esp8266-alexa-multiple-wemo-switch](https://gi
 
 
 ## How to define switches:
-To add a new switch to your project , populate below array with your invocation name and ESP8266's GPIO pin number
+To add a new switch to your project , populate below array with your invocation name and ESP8266's GPIO pin number in wemos.ino
 
         /*add your switch details here*/
         /*Format {< invocation name >,< GPIO pin number of ESP8266 >} . Add more switches separeated by commas(',')*/
