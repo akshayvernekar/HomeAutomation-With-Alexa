@@ -107,7 +107,7 @@ void handleWifiSave() {
   server.sendHeader("Expires", "-1");
   server.send ( 302, "text/plain", "");  // Empty content inhibits Content-length header so we have to close the socket ourselves.
   server.client().stop(); // Stop is needed because we sent no content length
-//  saveCredentials();
+  saveCredentials();
 connectWifi();
   //canConnect = strlen(ssid) > 0; // Request WLAN connect with new credentials if there is a SSID
 }

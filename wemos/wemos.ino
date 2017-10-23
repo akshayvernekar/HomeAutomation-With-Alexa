@@ -17,7 +17,7 @@ struct DeviceDetail
 
 /*add your switch details here*/
 /*Format {< invocation name >,< GPIO pin number of ESP8266 >} . Add more switches separeated by commas(',')*/
-DeviceDetail deviceArray[] = {{"room lights",D4},{"fan",14}};
+DeviceDetail deviceArray[] = {{"room lights",D4},{"fan",D3}};
 
 // #######################################################################
 
@@ -151,7 +151,7 @@ boolean connectWifi(){
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-    if (i > 100){
+    if (i > 50){
       state = false;
       break;
     }
